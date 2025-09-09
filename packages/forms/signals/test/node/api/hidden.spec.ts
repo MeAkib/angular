@@ -76,8 +76,8 @@ describe('hidden', () => {
       {injector: TestBed.inject(Injector)},
     );
 
-    expect(f.name().valid()).withContext('Name is intially invalid').toBeFalse();
-    expect(f().valid()).withContext('Form is intially invalid').toBeFalse();
+    expect(f.name().valid()).withContext('Name is initially invalid').toBeFalse();
+    expect(f().valid()).withContext('Form is initially invalid').toBeFalse();
 
     f.name().value.set('hidden-cat');
     expect(f.name().hidden()).toBeTrue();
@@ -101,8 +101,8 @@ describe('hidden', () => {
       {injector: TestBed.inject(Injector)},
     );
 
-    expect(f.name().touched()).withContext('Name is intially untouched').toBeFalse();
-    expect(f().touched()).withContext('Form is intially intouched').toBeFalse();
+    expect(f.name().touched()).withContext('Name is initially untouched').toBeFalse();
+    expect(f().touched()).withContext('Form is initially intouched').toBeFalse();
 
     f.name().markAsTouched();
     expect(f.name().touched()).toBeTrue();
