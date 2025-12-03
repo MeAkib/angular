@@ -7,6 +7,7 @@
  */
 
 import {Type} from '../../interface/type';
+import {getComponentDef} from '../def_getters';
 import {NG_COMP_DEF} from '../fields';
 
 /**
@@ -45,9 +46,7 @@ export function stringifyForError(value: any): string {
  * Important! This function contains a megamorphic read and should only be used for error messages.
  */
 export function debugStringifyTypeForError(type: Type<any>): string {
-  // TODO(pmvald): Do some refactoring so that we can use getComponentDef here without creating
-  // circular deps.
-  let componentDef = (type as any)[NG_COMP_DEF] || null;
+  const componentDef = getComponentDef(type);
   if (componentDef !== null && componentDef.debugInfo) {
     return stringifyTypeFromDebugInfo(componentDef.debugInfo);
   }
