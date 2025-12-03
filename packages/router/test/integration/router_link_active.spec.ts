@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import {Component, NgZone} from '@angular/core';
+import {Component, NgZone, ViewChild} from '@angular/core';
 import {Location} from '@angular/common';
 import {TestBed} from '@angular/core/testing';
-import {Router, provideRouter} from '../../src';
+import {Router, RouterLinkActive, RouterModule, provideRouter, withRouterConfig} from '../../src';
 import {By} from '@angular/platform-browser';
 import {
   RootCmp,
@@ -21,6 +21,7 @@ import {
   createRoot,
   advance,
 } from './integration_helpers';
+import {exactMatchOptions} from '../../src/router';
 
 export function routerLinkActiveIntegrationSuite() {
   describe('routerLinkActive', () => {
@@ -305,5 +306,33 @@ export function routerLinkActiveIntegrationSuite() {
       expect(nativeLink.hasAttribute('aria-current')).toEqual(false);
       expect(nativeButton.hasAttribute('aria-current')).toEqual(false);
     });
+
+    // describe('Router.isActive with equalParams', () => {
+    //   it('should use shallow equality by default', async () => {
+    //     TestBed.configureTestingModule({
+    //       providers: [provideRouter([], withRouterConfig({}))],
+    //     });
+
+    //     const router = TestBed.inject(Router);
+    //     const tree1 = router.createUrlTree(['/test'], {queryParams: {tags: ['a', 'b']}});
+    //     const tree2 = router.createUrlTree(['/test'], {queryParams: {tags: ['a', 'b']}});
+
+    //     await router.navigateByUrl(tree1);
+    //     expect(router.isActive(tree2, exactMatchOptions)).toBe(false);
+    //   });
+
+    //   it('should use deep equality when configured', async () => {
+    //     TestBed.configureTestingModule({
+    //       providers: [provideRouter([], withRouterConfig({paramsEqualityDepth: 'deep'}))],
+    //     });
+
+    //     const router = TestBed.inject(Router);
+    //     const tree1 = router.createUrlTree(['/test'], {queryParams: {tags: ['a', 'b']}});
+    //     const tree2 = router.createUrlTree(['/test'], {queryParams: {tags: ['a', 'b']}});
+
+    //     await router.navigateByUrl(tree1);
+    //     expect(router.isActive(tree2, exactMatchOptions)).toBe(true);
+    //   });
+    // });
   });
 }

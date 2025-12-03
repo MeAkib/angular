@@ -91,3 +91,43 @@ export function wrapIntoPromise<T>(value: T | Promise<T> | Observable<T>): Promi
   }
   return Promise.resolve(value);
 }
+
+export function deepEqual(
+  a: {[key: string | symbol]: any},
+  b: {[key: string | symbol]: any},
+): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+
+  const k1 = getDataKeys(a);
+  const k2 = getDataKeys(b);
+
+  if (k1.length !== k2.length) return false;
+
+  for (const key of k1) {
+    if (!(key in b)) return false;
+
+    const valA = a[key];
+    const valB = b[key];
+
+    // Fast path for identity
+    if (valA === valB) continue;
+
+    // Handle arrays
+    if (Array.isArray(valA) && Array.isArray(valB)) {
+      if (!shallowEqualArrays(valA, valB)) return false;
+      continue;
+    }
+
+    // Handle nested objects
+    if (valA !== null && valB !== null && typeof valA === 'object' && typeof valB === 'object') {
+      if (!deepEqual(valA, valB)) return false;
+      continue;
+    }
+
+    // Primitive comparison
+    if (valA !== valB) return false;
+  }
+
+  return true;
+}

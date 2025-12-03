@@ -8,7 +8,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {exactMatchOptions, Router, subsetMatchOptions} from '../src/router';
-import {containsTree, DefaultUrlSerializer} from '../src/url_tree';
+import {containsTree, DefaultUrlSerializer, equalParams} from '../src/url_tree';
 
 describe('UrlTree', () => {
   const serializer = new DefaultUrlSerializer();
@@ -328,6 +328,126 @@ describe('UrlTree', () => {
           },
         );
       });
+    });
+
+    describe('equalParams with deep equality configuration', () => {
+      it('should return true for arrays with same content when deep equality is enabled', () => {
+        const a = {tags: ['angular', 'typescript']};
+        const b = {tags: ['angular', 'typescript']};
+        expect(equalParams(a, b, {paramsEqualityDepth: 'deep'})).toBe(true);
+      });
+
+      it('should handle nested objects with deep equality', () => {
+        const a = {filter: {tags: ['a', 'b'], page: 1}};
+        const b = {filter: {tags: ['a', 'b'], page: 1}};
+        expect(equalParams(a, b, {paramsEqualityDepth: 'deep'})).toBe(true);
+      });
+
+      it('should return false for different nested objects', () => {
+        const a = {filter: {tags: ['a', 'b'], page: 1}};
+        const b = {filter: {tags: ['a', 'b'], page: 2}};
+        expect(equalParams(a, b, {paramsEqualityDepth: 'deep'})).toBe(false);
+      });
+    });
+
+    it('should handle null values', () => {
+      expect(equalParams({a: null}, {a: null}, {paramsEqualityDepth: 'deep'})).toBe(true);
+      expect(equalParams({a: null}, {a: undefined}, {paramsEqualityDepth: 'deep'})).toBe(false);
+    });
+
+    it('should handle undefined values', () => {
+      expect(equalParams({a: undefined}, {a: undefined}, {paramsEqualityDepth: 'deep'})).toBe(true);
+    });
+
+    it('should handle empty arrays', () => {
+      expect(equalParams({tags: []}, {tags: []}, {paramsEqualityDepth: 'deep'})).toBe(true);
+    });
+
+    it('should handle empty objects', () => {
+      expect(equalParams({}, {}, {paramsEqualityDepth: 'deep'})).toBe(true);
+      expect(equalParams({data: {}}, {data: {}}, {paramsEqualityDepth: 'deep'})).toBe(true);
+    });
+
+    it('should handle arrays with different lengths', () => {
+      expect(equalParams({tags: ['a', 'b']}, {tags: ['a']}, {paramsEqualityDepth: 'deep'})).toBe(
+        false,
+      );
+    });
+
+    it('should handle mixed types', () => {
+      expect(equalParams({val: 1}, {val: '1'}, {paramsEqualityDepth: 'deep'})).toBe(false);
+      expect(equalParams({val: true}, {val: 1}, {paramsEqualityDepth: 'deep'})).toBe(false);
+    });
+
+    it('should handle nested arrays', () => {
+      const a = {
+        data: [
+          ['a', 'b'],
+          ['c', 'd'],
+        ],
+      };
+      const b = {
+        data: [
+          ['a', 'b'],
+          ['c', 'd'],
+        ],
+      };
+      expect(equalParams(a, b, {paramsEqualityDepth: 'deep'})).toBe(true);
+
+      const c = {
+        data: [
+          ['a', 'b'],
+          ['c', 'e'],
+        ],
+      };
+      expect(equalParams(a, c, {paramsEqualityDepth: 'deep'})).toBe(false);
+    });
+
+    it('should handle arrays with objects', () => {
+      const a = {items: [{id: 1}, {id: 2}]};
+      const b = {items: [{id: 1}, {id: 2}]};
+      expect(equalParams(a, b, {paramsEqualityDepth: 'deep'})).toBe(true);
+
+      const c = {items: [{id: 1}, {id: 3}]};
+      expect(equalParams(a, c, {paramsEqualityDepth: 'deep'})).toBe(false);
+    });
+
+    it('should handle deeply nested structures', () => {
+      const a = {level1: {level2: {level3: {value: 'deep'}}}};
+      const b = {level1: {level2: {level3: {value: 'deep'}}}};
+      expect(equalParams(a, b, {paramsEqualityDepth: 'deep'})).toBe(true);
+    });
+
+    it('should handle objects with extra keys', () => {
+      const a = {id: '1', name: 'test'};
+      const b = {id: '1'};
+      expect(equalParams(a, b, {paramsEqualityDepth: 'deep'})).toBe(false);
+      expect(equalParams(b, a, {paramsEqualityDepth: 'deep'})).toBe(false);
+    });
+
+    it('should handle special number values', () => {
+      expect(equalParams({val: NaN}, {val: NaN}, {paramsEqualityDepth: 'deep'})).toBe(false); // NaN !== NaN
+      expect(equalParams({val: Infinity}, {val: Infinity}, {paramsEqualityDepth: 'deep'})).toBe(
+        true,
+      );
+      expect(equalParams({val: 0}, {val: -0}, {paramsEqualityDepth: 'deep'})).toBe(true); // 0 === -0
+    });
+
+    it('should handle boolean values', () => {
+      expect(equalParams({active: true}, {active: true}, {paramsEqualityDepth: 'deep'})).toBe(true);
+      expect(equalParams({active: true}, {active: false}, {paramsEqualityDepth: 'deep'})).toBe(
+        false,
+      );
+    });
+
+    it('should handle string values', () => {
+      expect(equalParams({name: ''}, {name: ''}, {paramsEqualityDepth: 'deep'})).toBe(true);
+      expect(equalParams({name: 'test'}, {name: 'test'}, {paramsEqualityDepth: 'deep'})).toBe(true);
+    });
+
+    it('should handle number values', () => {
+      expect(equalParams({count: 0}, {count: 0}, {paramsEqualityDepth: 'deep'})).toBe(true);
+      expect(equalParams({count: 42}, {count: 42}, {paramsEqualityDepth: 'deep'})).toBe(true);
     });
   });
 });

@@ -9,7 +9,7 @@
 import {Location} from '@angular/common';
 import {EnvironmentInjector, inject, ɵConsole as Console} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
-import {RouterModule} from '../index';
+import {provideRouter, RouterModule, withRouterConfig} from '../index';
 import {of} from 'rxjs';
 
 import {ChildActivationStart} from '../src/events';
@@ -17,7 +17,7 @@ import {GuardResult, Routes} from '../src/models';
 import {NavigationTransition} from '../src/navigation_transition';
 import {checkGuards as checkGuardsOperator} from '../src/operators/check_guards';
 import {resolveData as resolveDataOperator} from '../src/operators/resolve_data';
-import {Router} from '../src/router';
+import {exactMatchOptions, Router} from '../src/router';
 import {ChildrenOutletContexts} from '../src/router_outlet_context';
 import {createEmptyStateSnapshot, RouterStateSnapshot} from '../src/router_state';
 import {DefaultUrlSerializer, UrlSerializer, UrlTree} from '../src/url_tree';
@@ -881,6 +881,56 @@ describe('Router', () => {
           expect(s2.root.firstChild!.firstChild!.data).toEqual({data: 'resolver2_value'});
         });
       });
+    });
+  });
+
+  describe('Router.isActive with deep equality', () => {
+    it('should treat array params as equal when deep equality is configured', async () => {
+      class TestComponent {}
+
+      TestBed.configureTestingModule({
+        providers: [
+          provideRouter(
+            [{path: 'test', component: TestComponent}],
+            withRouterConfig({paramsEqualityDepth: 'deep'}),
+          ),
+        ],
+      });
+
+      const router = TestBed.inject(Router);
+      const tree1 = router.createUrlTree(['/test'], {queryParams: {tags: ['a', 'b']}});
+      const tree2 = router.createUrlTree(['/test'], {queryParams: {tags: ['a', 'b']}});
+
+      await router.navigateByUrl(tree1);
+      expect(router.isActive(tree2, exactMatchOptions)).toBe(true);
+    });
+
+    it('should treat array params as unequal by default (shallow equality)', async () => {
+      class TestComponent {}
+
+      TestBed.configureTestingModule({
+        providers: [
+          provideRouter([{path: 'test', component: TestComponent}]),
+          // Explicitly no config - should default to shallow
+        ],
+      });
+
+      const router = TestBed.inject(Router);
+
+      // Create two SEPARATE arrays with same content
+      const tags1 = ['a', 'b'];
+      const tags2 = ['a', 'b']; // Different reference!
+
+      console.log('Same reference?', tags1 === tags2); // Should log: false
+
+      await router.navigate(['/test'], {queryParams: {tags: tags1}});
+
+      const tree2 = router.createUrlTree(['/test'], {queryParams: {tags: tags2}});
+
+      const isActive = router.isActive(tree2, exactMatchOptions);
+      console.log('Is active?', isActive); // Debug output
+
+      expect(isActive).toBe(false);
     });
   });
 });
