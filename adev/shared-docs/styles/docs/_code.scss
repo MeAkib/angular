@@ -78,9 +78,6 @@ $code-font-size: 0.875rem;
       background-clip: text;
       -webkit-background-clip: text;
       color: transparent;
-      max-width: max-content;
-      width: 100%;
-      display: inline-block;
 
       &::before {
         content: '';
