@@ -14,7 +14,7 @@ const originalRequire = require;
 /**
  * This method provides a custom implementation for the require function to resolve
  * `typescript` module at runtime. We provide this as an override to the built-in
- * 'require' method using the banner funcionality of esbuild. That is, esbuild will
+ * 'require' method using the banner functionality of esbuild. That is, esbuild will
  * compile the server and add this banner to the top of the compilation so any place
  * in the server code that uses `require` will get routed through this override.
  *
