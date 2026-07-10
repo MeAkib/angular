@@ -67,14 +67,41 @@ export function formatCode(token: CodeToken, context: RendererContext): string {
   return containerEl.outerHTML;
 }
 
+/** Shiki comment color for the configured github-light / github-dark themes. */
+const COMMENT_COLOR = '#6A737D';
+
 /**
  * Process a DOM element to find spans (created by Shiki) and converts them to API links if they match entries.
  */
 export function processForApiLinks(fragment: Element, apiEntries: ApiEntries): void {
   const spans = fragment.querySelectorAll('span:not(:has(span))');
 
+  // Shiki may split an HTML/template comment (`<!-- ... -->`) across several
+  // sibling spans whose inner text is NOT comment-colored, so a per-span color
+  // check cannot detect it. Track the open/close delimiters across spans instead.
+  let insideHtmlComment = false;
+
   spans.forEach((span) => {
-    const symbolMatch = span.textContent?.match(/^(.*?)(\w+)(.*)$/);
+    const text = span.textContent ?? '';
+
+    const opensComment = text.includes('<!--');
+    const closesComment = text.includes('-->');
+
+    if (opensComment) {
+      insideHtmlComment = true;
+    }
+
+    // Whether this span sits within an HTML comment (covers the opening,
+    // closing, and any spans in between).
+    const skip = insideHtmlComment || isCommentSpan(span);
+
+    if (closesComment) {
+      insideHtmlComment = false;
+    }
+
+    if (skip) return;
+
+    const symbolMatch = text.match(/^(.*?)(\w+)(.*)$/);
     if (!symbolMatch) return;
 
     // Yes, index 0 is not interesting for us here
@@ -93,6 +120,13 @@ export function processForApiLinks(fragment: Element, apiEntries: ApiEntries): v
       span.append(fragment.ownerDocument!.createTextNode(after));
     }
   });
+}
+
+/** Returns whether a Shiki-generated span represents a code comment. */
+function isCommentSpan(span: Element): boolean {
+  const style = span.getAttribute('style');
+  if (!style) return false;
+  return style.toUpperCase().includes(COMMENT_COLOR.toUpperCase());
 }
 
 /** Build the header element if a header is provided in the token. */

@@ -57,4 +57,19 @@ describe('markdown to html', () => {
     const codeBlock = markdownDocument.querySelectorAll('.docs-code')[5];
     expect(codeBlock.getAttribute('hideDollar')).toBe('true');
   });
+
+  it('should not link API symbols inside single-line (//) comments', () => {
+    const codeBlock = markdownDocument.querySelectorAll('code')[6];
+    expect(codeBlock?.innerHTML).not.toContain('href="/api/router/CanActivateChild"');
+  });
+
+  it('should not link API symbols inside HTML comments (uniform comment color)', () => {
+    const codeBlock = markdownDocument.querySelectorAll('code')[7];
+    expect(codeBlock?.innerHTML).not.toContain('href="/api/core/Component"');
+  });
+
+  it('should not link API symbols inside HTML comments (split delimiter color)', () => {
+    const codeBlock = markdownDocument.querySelectorAll('code')[8];
+    expect(codeBlock?.innerHTML).not.toContain('href="/api/core/Component"');
+  });
 });

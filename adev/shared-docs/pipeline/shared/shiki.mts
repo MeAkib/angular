@@ -84,6 +84,9 @@ function removeWhitespaceTransformer(): ShikiTransformer {
   };
 }
 
+/** Matches HTML/template comments, which the TypeScript scanner does not recognize. */
+const HTML_COMMENT_REGEX = /<!--[\s\S]*?-->/g;
+
 /** A custom transformer which adds a link to local API entries whenever a matching identifier is discovered in the code block. */
 function linkApiEntriesTransformer(apiEntries?: ApiEntries): ShikiTransformer {
   if (apiEntries === undefined) {
@@ -92,25 +95,36 @@ function linkApiEntriesTransformer(apiEntries?: ApiEntries): ShikiTransformer {
   return {
     preprocess(code, options) {
       options.decorations ??= [];
+
+      // Collect HTML/template comment ranges the TS scanner cannot see.
+      const commentRanges: Array<[number, number]> = [];
+      let match: RegExpExecArray | null;
+      HTML_COMMENT_REGEX.lastIndex = 0;
+      while ((match = HTML_COMMENT_REGEX.exec(code)) !== null) {
+        commentRanges.push([match.index, match.index + match[0].length]);
+      }
+      const isInsideHtmlComment = (start: number): boolean =>
+        commentRanges.some(([from, to]) => start >= from && start < to);
+
       scanner.setText(code);
       let token = scanner.scan();
 
       while (token !== ts.SyntaxKind.EndOfFileToken) {
         if (token === ts.SyntaxKind.Identifier) {
+          const tokenStart = scanner.getTokenStart();
           const symbolUrl = getSymbolUrl(scanner.getTokenText(), apiEntries);
-          if (symbolUrl !== undefined) {
+          if (symbolUrl !== undefined && !isInsideHtmlComment(tokenStart)) {
             options.decorations.push({
-              transform: (el) => {
+              transform: (el: any) => {
                 el.tagName = 'a';
                 el.properties['href'] = symbolUrl;
                 return el;
               },
-              start: scanner.getTokenStart(),
+              start: tokenStart,
               end: scanner.getTokenEnd(),
             });
           }
         }
-
         token = scanner.scan();
       }
 
