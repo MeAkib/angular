@@ -24,7 +24,6 @@ import {
   signal,
   TransferState,
 } from '../../src/core';
-import {promiseWithResolvers} from '../../src/util/promise_with_resolvers';
 import {TestBed} from '../../testing';
 
 abstract class MockBackend<T, R> {
@@ -343,7 +342,7 @@ describe('resource', () => {
     const res = resource({
       params: request,
       loader: async ({params}) => {
-        const p = promiseWithResolvers<number>();
+        const p = Promise.withResolvers<number>();
         resolve.push(() => p.resolve(params));
         return p.promise;
       },
