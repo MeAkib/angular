@@ -221,6 +221,36 @@ describe('ExampleViewer', () => {
     expect(lines).toEqual(['line hidden', 'line', 'line']);
   });
 
+  it('expands the code block when a gap between visible ranges is clicked', async () => {
+    componentRef.setInput(
+      'metadata',
+      getMetadata({
+        files: [
+          {
+            name: 'example.ts',
+            sanitizedContent:
+              '<pre><code><div class="line">one</div><div class="line">two</div><div class="line">three</div></code></pre>',
+            visibleLinesRange: '1,3',
+          },
+        ],
+      }),
+    );
+
+    await component.renderExample();
+    await fixture.whenStable();
+
+    const gap = fixture.debugElement.query(By.css('button.line.gap'));
+    expect(gap).not.toBeNull();
+    expect(component.expanded()).toBeFalse();
+
+    gap.nativeElement.click();
+    await fixture.whenStable();
+
+    expect(component.expanded()).toBeTrue();
+    expect(fixture.debugElement.query(By.css('.line.gap'))).toBeNull();
+    expect(fixture.debugElement.query(By.css('.line.hidden'))).toBeNull();
+  });
+
   it('hides the line numbers that pair with the hidden lines', async () => {
     const numbered = (n: number, text: string) =>
       `<span class="shiki-ln-number">${n}</span><div class="line">${text}</div>`;

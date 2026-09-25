@@ -172,7 +172,7 @@ export class ExampleViewer {
 
     const lineNumbers = this.getHiddenCodeLineNumbers();
 
-    const gapLines = <HTMLDivElement[]>(
+    const gapLines = <HTMLButtonElement[]>(
       Array.from(
         this.elementRef.nativeElement.querySelectorAll(
           `.${CODE_LINE_CLASS_NAME}.${GAP_CODE_LINE_CLASS_NAME}`,
@@ -224,17 +224,20 @@ export class ExampleViewer {
     }
 
     // Create gap line between visible ranges. For example we would like to display 10-16 and 20-29 lines.
-    // We should display separator, gap between those two scopes.
-    // TODO: we could replace div it with the component, and allow to expand code block after click.
+    // We should display separator, gap between those two scopes. Clicking the separator expands the code block.
     for (const [index, element] of appendGapBefore.entries()) {
       if (index === 0) {
         continue;
       }
 
-      const separator = this.document.createElement('div');
+      const separator = this.document.createElement('button');
+      separator.type = 'button';
       separator.textContent = `...`;
+      separator.setAttribute('aria-label', 'Show hidden lines');
       separator.classList.add(CODE_LINE_CLASS_NAME);
       separator.classList.add(GAP_CODE_LINE_CLASS_NAME);
+      // The separators are removed once the code block is expanded, so this only runs while collapsed.
+      separator.addEventListener('click', () => this.toggleExampleVisibility());
       element.parentNode?.insertBefore(separator, element);
     }
   }

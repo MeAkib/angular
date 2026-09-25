@@ -490,6 +490,19 @@ $code-font-size: 0.875rem;
     color: var(--quaternary-contrast);
   }
 
+  // Gap lines between visible ranges of a collapsed code example expand the example when clicked.
+  button.gap {
+    width: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--primary-contrast);
+    }
+  }
+
   .hljs-constructor {
     color: var(--symbolic-cyan);
   }
