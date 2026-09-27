@@ -8,7 +8,7 @@
 
 import {Clipboard} from '@angular/cdk/clipboard';
 import {CdkMenu, CdkMenuItem, CdkMenuTrigger} from '@angular/cdk/menu';
-import {Component, inject, signal} from '@angular/core';
+import {Component, inject, input, OnInit, signal} from '@angular/core';
 import {IconComponent} from '@angular/docs';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
 import {MatCheckbox} from '@angular/material/checkbox';
@@ -56,7 +56,7 @@ const isWindows = typeof window !== 'undefined' && window.navigator.userAgent.in
     '(click)': 'copyCode($event)',
   },
 })
-export default class UpdateComponent {
+export default class UpdateComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
 
   protected title = signal('');
@@ -130,13 +130,17 @@ export default class UpdateComponent {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
 
-  constructor() {
-    const queryMap = this.activatedRoute.snapshot.queryParamMap;
+  /** Bound from the `v` query param, in the `<from>-<to>` format (e.g. `21.0-22.0`). */
+  readonly versionsParam = input<string>(undefined, {alias: 'v'});
+  /** Bound from the `l` query param, the application complexity level. */
+  readonly levelParam = input<string>(undefined, {alias: 'l'});
+
+  ngOnInit(): void {
     // Detect settings in URL
-    this.level = parseInt(queryMap.get('l')!, 10) || this.level;
+    this.level = parseInt(this.levelParam()!, 10) || this.level;
 
     // Detect versions of from and to
-    const versions = queryMap.get('v');
+    const versions = this.versionsParam();
     if (versions) {
       const [from, to] = versions.split('-');
       this.from = this.versions.find((version) => version.name === from)!;
