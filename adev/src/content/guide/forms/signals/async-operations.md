@@ -180,7 +180,7 @@ onSuccess: (response: { usernameTaken: boolean; profanity: boolean }) => {
 } // prettier-ignore
 ```
 
-The type for `onSuccess` can be specified either directly in the parameter, or with the `parse` property of `validateHttp`'s `options`
+The type for `onSuccess` can be specified either directly in the parameter, or with the `parse` property of `validateHttp`'s `options`.
 
 ```ts
 onSuccess: (response: { usernameTaken: boolean; profanity: boolean }) => {
@@ -190,8 +190,8 @@ onSuccess: (response: { usernameTaken: boolean; profanity: boolean }) => {
 // or
 
 options: {
-  parse: (response) => response as {usernameTaken: boolean; profanity: boolean};
-}
+  parse: (response) => response as {usernameTaken: boolean; profanity: boolean},
+},
 onSuccess: (response) => {
   // ...
 } // prettier-ignore
@@ -211,19 +211,19 @@ onError: (error) => {
 
 ### HTTP options
 
-Customize the HTTP request with the `options` parameter:
+Customize the HTTP request by returning an `HttpResourceRequest` object from `request` instead of a URL:
 
 ```ts
 import {HttpHeaders} from '@angular/common/http';
 
 validateHttp(schemaPath.field, {
-  request: ({value}) => `/api/validate?value=${value()}`,
-  options: {
+  request: ({value}) => ({
+    url: `/api/validate?value=${value()}`,
     headers: new HttpHeaders({
       Authorization: 'Bearer token',
     }),
     timeout: 5000,
-  },
+  }),
   onSuccess: (response: {valid: boolean}) =>
     response.valid
       ? null
@@ -238,7 +238,7 @@ validateHttp(schemaPath.field, {
 });
 ```
 
-TIP: See the [httpResource API documentation](api/common/http/httpResource) for all available options.
+TIP: See the [`HttpResourceRequest` API documentation](api/common/http/HttpResourceRequest) for all available request properties, and the [httpResource API documentation](api/common/http/httpResource) for the `options` parameter.
 
 ## Custom async validation with validateAsync()
 

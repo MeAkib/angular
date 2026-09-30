@@ -1,11 +1,11 @@
 import {Component, signal} from '@angular/core';
-import {email, form, FormField, minLength, required} from '@angular/forms/signals';
+import {email, form, FormField, FormRoot, minLength, required} from '@angular/forms/signals';
 
 @Component({
   selector: 'app-login',
-  imports: [FormField],
+  imports: [FormField, FormRoot],
   template: `
-    <form (submit)="onSubmit()">
+    <form [formRoot]="loginForm">
       <div>
         <label>
           Email
@@ -30,7 +30,7 @@ import {email, form, FormField, minLength, required} from '@angular/forms/signal
         }
       </div>
 
-      <button type="submit" [disabled]="loginForm().invalid()">Sign In</button>
+      <button type="submit">Sign In</button>
     </form>
   `,
 })
@@ -40,18 +40,22 @@ export class LoginComponent {
     password: '',
   });
 
-  loginForm = form(this.loginModel, (fieldPath) => {
-    required(fieldPath.email, {message: 'Email is required'});
-    email(fieldPath.email, {message: 'Enter a valid email address'});
+  loginForm = form(
+    this.loginModel,
+    (fieldPath) => {
+      required(fieldPath.email, {message: 'Email is required'});
+      email(fieldPath.email, {message: 'Enter a valid email address'});
 
-    required(fieldPath.password, {message: 'Password is required'});
-    minLength(fieldPath.password, 8, {message: 'Password must be at least 8 characters'});
-  });
-
-  onSubmit() {
-    if (this.loginForm().valid()) {
-      const credentials = this.loginModel();
-      console.log('Submitting:', credentials);
-    }
-  }
+      required(fieldPath.password, {message: 'Password is required'});
+      minLength(fieldPath.password, 8, {message: 'Password must be at least 8 characters'});
+    },
+    {
+      submission: {
+        // Only runs when the form is valid.
+        action: async (field) => {
+          console.log('Submitting:', field().value());
+        },
+      },
+    },
+  );
 }
