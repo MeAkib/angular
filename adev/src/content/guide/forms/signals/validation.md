@@ -38,7 +38,7 @@ Validation in Signal Forms follows this pattern:
 3. **Error propagation** - Validation errors are exposed through field state signals
 4. **Reactive updates** - UI automatically updates when validation state changes
 
-Validation runs on every value change for interactive fields. Hidden and disabled fields don't run validation - their validation rules are skipped until the field becomes interactive again.
+Validation runs on every value change for interactive fields. Hidden, disabled, and readonly fields don't run validation - their validation rules are skipped until the field becomes interactive again.
 
 ### Validation timing
 
@@ -360,9 +360,7 @@ export class OrderComponent {
 
 When validation rules fail, they produce error objects that describe what went wrong. Understanding error structure helps you provide clear feedback to users.
 
-<!-- TODO: Uncomment when field state management guide is published
-
-NOTE: This section covers the errors that validation rules produce. For displaying and using validation errors in your UI, see the [Field State Management guide](guide/forms/signals/field-state-management). -->
+NOTE: This section covers the errors that validation rules produce. For displaying and using validation errors in your UI, see the [Field State Management guide](guide/forms/signals/field-state-management).
 
 ### Error structure
 
