@@ -15,6 +15,15 @@ This is the source code for the Angular framework. This guide outlines standard 
 - [Coding Standards](contributing-docs/coding-standards.md): style guide for TypeScript and other files.
 - [Commit Guidelines](contributing-docs/commit-message-guidelines.md): format for commit messages and PR titles.
 
+## Comments
+
+Follow [Write useful comments](contributing-docs/coding-standards.md#write-useful-comments), and keep them short. Agent-written comments tend to be too long for the value they add.
+
+- Prefer one or two lines. Reserve anything longer for genuinely non-obvious reasoning.
+- Explain **why**, not what. Drop anything restated from the code on the next line.
+- Say it once. Don't restate the same reason in the declaration, the usage, and the test.
+- Narrate the code, not the investigation: no history of what was tried, ruled out, or fixed. That belongs in the commit message or the linked issue.
+
 ## Testing
 
 - **Zoneless & Async-First:** Assume a zoneless environment where state changes schedule updates asynchronously.
