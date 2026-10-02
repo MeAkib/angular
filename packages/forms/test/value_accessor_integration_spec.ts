@@ -1530,9 +1530,10 @@ describe('value accessors', () => {
         TestBed.overrideComponent(FormControlComp, {
           set: {template: `<input type="text" [formControl]="control" wrapped-value>`},
         });
-        const fixture = initTest(FormControlComp);
+        const fixture = initTest(FormControlComp, WrappedValue);
         fixture.componentInstance.control = new FormControl({value: 'aa', disabled: true});
         await fixture.whenStable();
+        expect(fixture.debugElement.query(By.directive(WrappedValue))).not.toBeNull();
         expect(fixture.componentInstance.control.status).toEqual('DISABLED');
       });
 
