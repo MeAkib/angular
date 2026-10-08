@@ -248,8 +248,20 @@ export class NgClassMigration extends TsurgeFunnelMigration<
 
   override async migrate(globalData: NgClassCompilationUnitData) {
     const replacements: Replacement[] = [];
+    const migratedRanges = new Set<string>();
+    const templateReplacements = globalData.ngClassReplacements.flatMap(
+      ({replacements}) => replacements,
+    );
 
-    replacements.push(...globalData.ngClassReplacements.flatMap(({replacements}) => replacements));
+    for (const replacement of templateReplacements) {
+      // Components can share an external template, so only migrate each range once.
+      const {position, end} = replacement.update.data;
+      const key = JSON.stringify([replacement.projectFile.id, position, end]);
+      if (!migratedRanges.has(key)) {
+        migratedRanges.add(key);
+        replacements.push(replacement);
+      }
+    }
 
     for (const fileIDStr of Object.keys(globalData.importReplacements)) {
       const fileID = fileIDStr as ProjectFileID;

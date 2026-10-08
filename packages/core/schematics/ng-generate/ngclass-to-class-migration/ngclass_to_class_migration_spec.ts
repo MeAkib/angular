@@ -76,6 +76,90 @@ describe('NgClass migration', () => {
     expect(content).toContain('<div [class.admin]="isAdmin">');
   });
 
+  it('should migrate an external template shared by multiple components once', async () => {
+    writeFile(
+      '/a.component.ts',
+      `
+        import {Component} from '@angular/core';
+        import {NgClass} from '@angular/common';
+        @Component({
+          imports: [NgClass],
+          templateUrl: './shared.html',
+        })
+        export class A {
+          isAdmin = true;
+        }
+      `,
+    );
+    writeFile(
+      '/b.component.ts',
+      `
+        import {Component} from '@angular/core';
+        import {NgClass} from '@angular/common';
+        @Component({
+          imports: [NgClass],
+          templateUrl: './shared.html',
+        })
+        export class B {
+          isAdmin = true;
+        }
+      `,
+    );
+    writeFile('/shared.html', `<div [ngClass]="{'admin': isAdmin}"></div>`);
+
+    await runMigration();
+
+    expect(tree.readContent('/shared.html')).toBe(`<div [class.admin]="isAdmin"></div>`);
+  });
+
+  it('should migrate an external template shared by components in different projects once', async () => {
+    writeFile('/tsconfig.json', JSON.stringify({files: ['a.component.ts']}));
+    writeFile('/tsconfig-2.json', JSON.stringify({files: ['b.component.ts']}));
+    writeFile(
+      '/angular.json',
+      JSON.stringify({
+        version: 1,
+        projects: {
+          a: {root: '', architect: {build: {options: {tsConfig: './tsconfig.json'}}}},
+          b: {root: '', architect: {build: {options: {tsConfig: './tsconfig-2.json'}}}},
+        },
+      }),
+    );
+    writeFile(
+      '/a.component.ts',
+      `
+        import {Component} from '@angular/core';
+        import {NgClass} from '@angular/common';
+        @Component({
+          imports: [NgClass],
+          templateUrl: './shared.html',
+        })
+        export class A {
+          isAdmin = true;
+        }
+      `,
+    );
+    writeFile(
+      '/b.component.ts',
+      `
+        import {Component} from '@angular/core';
+        import {NgClass} from '@angular/common';
+        @Component({
+          imports: [NgClass],
+          templateUrl: './shared.html',
+        })
+        export class B {
+          isAdmin = true;
+        }
+      `,
+    );
+    writeFile('/shared.html', `<div [ngClass]="{'admin': isAdmin}"></div>`);
+
+    await runMigration();
+
+    expect(tree.readContent('/shared.html')).toBe(`<div [class.admin]="isAdmin"></div>`);
+  });
+
   it('should remove NgClass import when no longer needed', async () => {
     writeFile(
       '/app.component.ts',
