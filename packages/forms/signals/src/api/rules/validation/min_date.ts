@@ -19,7 +19,7 @@ import {minDateError} from './validation_errors';
  * In addition to binding a validator, this function adds `MIN` property to the field.
  *
  * @param path Path of the field to validate
- * @param minDate The minimum date, or a LogicFn that returns the minimum date.
+ * @param minDateValue The minimum date, or a LogicFn that returns the minimum date.
  * @param config Optional, allows providing any of the following options:
  *  - `error`: Custom validation error(s) to be used instead of the default `minDateError()`
  *    or a function that receives the `FieldContext` and returns custom validation error(s).
