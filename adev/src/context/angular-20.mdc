@@ -41,6 +41,7 @@ This project adheres to modern Angular best practices, emphasizing maintainabili
         })
         export class MyComponent {}
         ```
+* **Default `OnPush`:** Do NOT set `changeDetection: ChangeDetectionStrategy.OnPush` explicitly. `OnPush` is the default in Angular v22+.
 * **Signals for State Management:** Utilize Angular Signals for reactive state management within components and services.
 * **Lazy Loading:** Implement lazy loading for feature routes to improve initial load times of your application.
 * **NgOptimizedImage:** Use `NgOptimizedImage` for all static images to automatically optimize image loading and performance.
@@ -63,9 +64,12 @@ This project adheres to modern Angular best practices, emphasizing maintainabili
         userId = input<string>('');
         userSelected = output<string>();
         ```
+* **`model()` for Two-Way Binding:** Use `model()` for two-way bound properties with `[(prop)]` syntax instead of pairing `input()` with `output()`.
 * **`computed()` for Derived State:** Use the `computed()` function from `@angular/core` for derived state based on signals.
+* **`linkedSignal()` for Synchronized State:** Use `linkedSignal()` for state derived from multiple reactive sources that must stay synchronized.
 * **Inline Templates:** Prefer inline templates (template: `...`) for small components to keep related code together. For larger templates, use external HTML files.
-* **Reactive Forms:** Prefer Reactive forms over Template-driven forms for complex forms, validation, and dynamic controls due to their explicit, immutable, and synchronous nature.
+* **Signal Forms:** Prefer Signal Forms (`@angular/forms/signals`) for new forms. They are stable in Angular v22+ and provide signal-based state, type-safe field access, and schema-based validation.
+* **Reactive Forms:** When not using Signal Forms, prefer Reactive forms over Template-driven forms for complex forms, validation, and dynamic controls due to their explicit, immutable, and synchronous nature.
 * **No `ngClass` / `NgClass`:** Do not use the `ngClass` directive. Instead, use native `class` bindings for conditional styling.
     * **Bad:**
         ```html
@@ -87,6 +91,7 @@ This project adheres to modern Angular best practices, emphasizing maintainabili
         <section [style.font-size.px]="fontSize"></section>
         <section [style]="myStyles"></section>
         ```
+* **No `CommonModule`:** Do NOT import `CommonModule`. Import only the directives and pipes the template uses, such as `AsyncPipe` or `DatePipe`.
 
 ## State Management
 
@@ -118,7 +123,7 @@ This project adheres to modern Angular best practices, emphasizing maintainabili
 ## Services
 
 * **Single Responsibility:** Design services around a single, well-defined responsibility.
-* **`providedIn: 'root'`:** Use the `providedIn: 'root'` option when declaring injectable services to ensure they are singletons and tree-shakable.
+* **`@Service` for Singletons:** Prefer the `@Service` decorator over `@Injectable({providedIn: 'root'})` for new singleton services (Angular v22+). Both make the service a tree-shakable singleton.
 * **`inject()` Function:** Prefer the `inject()` function over constructor injection when injecting dependencies, especially within `provide` functions, `computed` properties, or outside of constructor context.
     * **Old Constructor Injection:**
         ```typescript
