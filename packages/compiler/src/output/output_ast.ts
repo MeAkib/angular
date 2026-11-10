@@ -1950,14 +1950,6 @@ export function importExpr(
   return new ExternalExpr(id, null, typeParams, sourceSpan);
 }
 
-export function importType(
-  id: ExternalReference,
-  typeParams?: Type[] | null,
-  typeModifiers?: TypeModifier,
-): ExpressionType | null {
-  return id != null ? expressionType(importExpr(id, typeParams, null), typeModifiers) : null;
-}
-
 export function expressionType(
   expr: Expression,
   typeModifiers?: TypeModifier,

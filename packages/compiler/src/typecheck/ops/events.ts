@@ -14,7 +14,7 @@ import {getStatementsBlock, TcbExpr} from './codegen';
 import type {Context} from './context';
 import type {Scope} from './scope';
 import {TcbDirectiveMetadata} from '../api';
-import {TcbExpressionTranslator, unwrapWritableSignal} from './expression';
+import {TcbExpressionTranslator} from './expression';
 import {ExpressionIdentifier} from '../comments';
 import {checkSplitTwoWayBinding} from './bindings';
 import {LocalSymbol} from './references';

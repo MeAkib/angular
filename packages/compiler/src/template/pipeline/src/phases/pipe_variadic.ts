@@ -9,7 +9,7 @@
 import * as o from '../../../../output/output_ast';
 import * as ir from '../../ir';
 
-import type {CompilationJob, ComponentCompilationJob} from '../compilation';
+import type {CompilationJob} from '../compilation';
 
 /**
  * Pipes that accept more than 4 arguments are variadic, and are handled with a different runtime

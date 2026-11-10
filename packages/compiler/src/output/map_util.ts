@@ -14,8 +14,6 @@ export type MapEntry = {
   value: o.Expression;
 };
 
-export type MapLiteral = MapEntry[];
-
 export function mapLiteral(
   obj: {[key: string]: o.Expression},
   quoted: boolean = false,

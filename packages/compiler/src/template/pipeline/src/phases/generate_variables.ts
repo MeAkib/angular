@@ -325,7 +325,7 @@ function generateVariablesInScopeForView<OpT extends ir.Op<OpT>>(
   }
 
   // Add variables for all boundaries declared in this scope.
-  for (const [xref, {variable, handle}] of scope.boundaryVariables) {
+  for (const {variable, handle} of scope.boundaryVariables.values()) {
     newOps.push(
       ir.createVariableOp(
         view.job.allocateXrefId(),

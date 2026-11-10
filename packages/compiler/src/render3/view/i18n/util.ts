@@ -29,16 +29,6 @@ export function icuFromI18nMessage(message: i18n.Message) {
   return message.nodes[0] as i18n.IcuPlaceholder;
 }
 
-export function placeholdersToParams(placeholders: Map<string, string[]>): {
-  [name: string]: o.LiteralExpr;
-} {
-  const params: {[name: string]: o.LiteralExpr} = {};
-  placeholders.forEach((values: string[], key: string) => {
-    params[key] = o.literal(values.length > 1 ? `[${values.join('|')}]` : values[0]);
-  });
-  return params;
-}
-
 /**
  * Format the placeholder names in a map of placeholders to expressions.
  *

@@ -40,15 +40,6 @@ export function expandSafeReads(job: CompilationJob): void {
   }
 }
 
-// A lookup set of all the expression kinds that require a temporary variable to be generated.
-const requiresTemporary = [
-  o.InvokeFunctionExpr,
-  o.LiteralArrayExpr,
-  o.LiteralMapExpr,
-  o.ParenthesizedExpr,
-  ir.PipeBindingExpr,
-].map((e) => e.constructor.name);
-
 function needsTemporaryInSafeAccess(e: o.Expression): boolean {
   // TODO: We probably want to use an expression visitor to recursively visit all descendents.
   // However, that would potentially do a lot of extra work (because it cannot short circuit), so we
